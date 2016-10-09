@@ -1,25 +1,25 @@
 package cutil
 
-//#include "./cutil.c"
+//#include "./cutil.h"
 import "C"
 import "unsafe"
 
+// (**char,n) -> [][]byte
 func StrArrToByteSlice(arr **C.char, c int) [][]byte {
     slices := make([][]byte, c)
     for i := 0; i < c; i ++ {
-        s := C.At(arr, C.int(i))
+        s := C.StrArrAt(arr, C.int(i))
         l := C.int(C.strlen(s))
         //func C.GoBytes(cArray unsafe.Pointer, length C.int) []byte
         slices[i] = C.GoBytes(unsafe.Pointer(s), l)
     }
     return slices
 }
-func StrArrToStringSlice(arr **C.char, c int) []string {
+// (**char,n) -> []string
+func StrArrToStringSlice(strArr unsafe.Pointer, c int) []string {
     slices := make([]string, c)
     for i := 0; i < c; i ++ {
-        s := C.StrArrAt(arr, C.int(i))
-        l := C.int(C.strlen(s))
-        slices[i] = string(C.GoBytes(unsafe.Pointer(s), l))
+        slices[i] = string(C.GoString(C.StrArrAt((**C.char)(strArr), C.int(i))))
     }
     return slices
 }

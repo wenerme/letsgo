@@ -1,5 +1,5 @@
-#ifndef _CGO_CUTIL
-#define _CGO_CUTIL
+#ifndef CGO_CUTIL_H
+#define CGO_CUTIL_H
 
 #include <string.h>
 
