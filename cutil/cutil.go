@@ -3,6 +3,10 @@ package cutil
 //#include "./cutil.h"
 import "C"
 import "unsafe"
+import "reflect"
+import "fmt"
+//import "github.com/davecgh/go-spew/spew"
+
 
 // (**char,n) -> [][]byte
 func StrArrToByteSlice(arr **C.char, c int) [][]byte {
@@ -22,4 +26,35 @@ func StrArrToStringSlice(strArr unsafe.Pointer, c int) []string {
         slices[i] = string(C.GoString(C.StrArrAt((**C.char)(strArr), C.int(i))))
     }
     return slices
+}
+func PtrToUintptr(ptr unsafe.Pointer) uintptr {
+    return reflect.ValueOf(ptr).Pointer()
+}
+
+
+
+// Free this after use
+// defer C.free(ptr)
+func VarArgsPtr(args ...interface{}) (unsafe.Pointer, error) {
+    size := int(unsafe.Sizeof(C.uintptr_t(0)))
+    list := C.malloc(C.size_t(size * len(args)))
+
+    //values := make([]uintptr, len(args))
+    for i, arg := range args {
+        ptr := unsafe.Pointer(uintptr(list) + uintptr(size * i))
+        var val C.uintptr_t
+        ref := reflect.ValueOf(arg)
+        switch ref.Kind() {
+        case reflect.Chan, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Func, reflect.Slice:
+            val = C.uintptr_t(ref.Pointer())
+        case reflect.Uintptr:
+            val = C.uintptr_t(ref.Uint())
+        default:
+            return nil, fmt.Errorf("Can not cast %T %#v to uintptr", arg, arg)
+        }
+        *(*C.uintptr_t)(ptr) = val;
+        //values[i] = uintptr(val)
+    }
+    //spew.Dump(values)
+    return list, nil
 }
