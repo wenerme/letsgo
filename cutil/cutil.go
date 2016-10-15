@@ -55,6 +55,6 @@ func VarArgsPtr(args ...interface{}) (unsafe.Pointer, error) {
         *(*C.uintptr_t)(ptr) = val;
         //values[i] = uintptr(val)
     }
-    //spew.Dump(values)
+    //spew.Dump(values,list)
     return list, nil
 }
