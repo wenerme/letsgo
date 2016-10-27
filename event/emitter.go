@@ -15,7 +15,7 @@ const DefaultMaxListeners = 10
 var ErrNoneFunction = errors.New("Kind of Value for listener is not Func.")
 
 // RecoveryListener ...
-type RecoveryListener func(event interface{}, listener interface{}, err error)
+type RecoveryListener func(event interface{}, args []interface{}, listener interface{}, err error)
 // If there is no listener for event
 type DeadEventListener func(event interface{}, args []interface{})
 
@@ -58,11 +58,7 @@ func (emitter *StdEmitter) AddListener(event, listener interface{}) *StdEmitter 
 	fn := reflect.ValueOf(listener)
 
 	if reflect.Func != fn.Kind() {
-		if nil == emitter.recoverer {
-			panic(ErrNoneFunction)
-		} else {
-			emitter.recoverer(event, listener, ErrNoneFunction)
-		}
+		handlerRecover(emitter.recoverer, event, listener, ErrNoneFunction, nil)
 	}
 
 	if emitter.maxListeners != -1 && emitter.maxListeners < len(emitter.events[event]) + 1 {
@@ -91,11 +87,7 @@ func (emitter *StdEmitter) RemoveListener(event, listener interface{}) *StdEmitt
 	fn := reflect.ValueOf(listener)
 
 	if reflect.Func != fn.Kind() {
-		if nil == emitter.recoverer {
-			panic(ErrNoneFunction)
-		} else {
-			emitter.recoverer(event, listener, ErrNoneFunction)
-		}
+		handlerRecover(emitter.recoverer, event, listener, ErrNoneFunction, nil)
 	}
 
 	if events, ok := emitter.events[event]; ok {
@@ -129,7 +121,7 @@ func handlerRecover(recoverer RecoveryListener, event interface{}, listener inte
 	if recoverer == nil {
 		panic(err)
 	}
-	recoverer(event, listener, err)
+	recoverer(event, args, listener, err)
 }
 
 func (emitter *StdEmitter)deadEvent(event interface{}, args[] interface{}) {
@@ -365,7 +357,7 @@ func NewEmitter() (emitter *StdEmitter) {
 }
 
 // Default emitter
-var DefaultEmitter = Emitter(NewEmitter())
+var DefaultEmitter = Emitter(NewEmitter().SetMaxListeners(30))
 
 func Once(event, listener interface{}) Emitter {
 	return DefaultEmitter.Once(event, listener)
