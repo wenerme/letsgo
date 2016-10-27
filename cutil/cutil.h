@@ -9,8 +9,12 @@ char *StrArrAt(char **strArr, int n) {
   return strArr[n];
 }
 
-intptr_t PtrToIntptr(void*ptr){
-    return (intptr_t)(ptr);
+uintptr_t PtrArrAt(void*arr, int n) {
+  return (uintptr_t)((void**)arr)[n];
+}
+
+uintptr_t PtrToIntptr(void*ptr){
+    return (uintptr_t)(ptr);
 }
 #endif
 

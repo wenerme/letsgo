@@ -9,7 +9,7 @@ import "fmt"
 
 
 // (**char,n) -> [][]byte
-func StrArrToByteSlice(arr **C.char, c int) [][]byte {
+func StrArrToByteSlice(arr unsafe.Pointer, c int) [][]byte {
     slices := make([][]byte, c)
     for i := 0; i < c; i ++ {
         s := C.StrArrAt(arr, C.int(i))
@@ -31,7 +31,9 @@ func PtrToUintptr(ptr unsafe.Pointer) uintptr {
     return reflect.ValueOf(ptr).Pointer()
 }
 
-
+func PtrArrAt(arr unsafe.Pointer, i int) uintptr {
+    return uintptr(C.PtrArrAt(arr, C.int(i)))
+}
 
 // Free this after use
 // defer C.free(ptr)
