@@ -1,10 +1,11 @@
 package bg
 
 type Created struct {
-	ID string
+	ID uint `json:"id"`
 }
 
 type General struct {
-	Code    int
-	Message string `json:"Message,omitempty"`
+	Code    int `json:"code"`
+	Message string `json:"message,omitempty"`
+	Path string `json:"path,omitempty"`
 }

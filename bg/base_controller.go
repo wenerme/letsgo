@@ -18,6 +18,20 @@ func (c*BaseController)Serve(v interface{}) {
 func (c*BaseController)ServeStatus(status int) {
 	c.ServeGeneral(http.StatusText(status), status)
 }
+func (c*BaseController)ServeError(err error) {
+	if err == nil {
+		c.ServeSuccess()
+		return
+	}
+	// 检测 err 是否为特殊的错误结构来附带更多的错误信息
+	c.Data["json"] = General{
+		Code: http.StatusInternalServerError,
+		Message: err.Error(),
+		Path: c.Ctx.Input.URL(),
+	}
+	c.ServeJSON()
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+}
 func (c*BaseController)ServeGeneral(message string, status int) {
 	c.Data["json"] = General{
 		Code:status,
@@ -29,10 +43,10 @@ func (c*BaseController)ServeGeneral(message string, status int) {
 
 func (c*BaseController)ServeCreated(v interface{}) {
 	switch v.(type){
-	case string:
-		c.Data["json"] = Created{ID:v.(string)}
+	case uint:
+		c.Data["json"] = Created{ID:v.(uint)}
 		c.ServeJSON()
-		c.Ctx.ResponseWriter.WriteHeader(http.StatusCreated)
+		//c.Ctx.ResponseWriter.WriteHeader(http.StatusCreated)
 	default:
 		panic(fmt.Sprintf("Can not handler created %v", v))
 	}
