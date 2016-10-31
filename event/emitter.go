@@ -369,8 +369,8 @@ func Off(event, listener interface{}) Emitter {
 	return DefaultEmitter.Off(event, listener)
 }
 func Emit(event interface{}, arguments ...interface{}) Emitter {
-	return DefaultEmitter.Emit(event, arguments)
+	return DefaultEmitter.Emit(event, arguments...)
 }
 func EmitSync(event interface{}, arguments ...interface{}) Emitter {
-	return DefaultEmitter.EmitSync(event, arguments)
+	return DefaultEmitter.EmitSync(event, arguments...)
 }
