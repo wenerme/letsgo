@@ -6,8 +6,8 @@ import "time"
 
 // 数据库基本模型
 type Model struct {
-	ID        uint       `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uint       `gorm:"primary_key" json:"id,omitempty"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at,omitempty"`
 	DeletedAt *time.Time `sql:"index" json:"deleted_at,omitempty"`
 }
