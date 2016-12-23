@@ -30,10 +30,25 @@ func (self Error)Error() string {
 }
 
 func CreateError(err interface{}) (e Error) {
+	if v, ok := err.(Error); ok {
+		return v
+	}
 	if v, ok := err.(error); ok {
 		e.Message = v.Error()
 	} else {
 		e.Message = fmt.Sprint(err)
 	}
+	e.Message = strings.TrimSpace(e.Message)
+	e.Status = 500
+	e.Code = e.Status
 	return e
+}
+func CreateErrorWithStatus(status int, err interface{}) (e Error) {
+	e = CreateError(err)
+	e.Status = status
+	e.Code = status
+	return
+}
+func CreateErrorBadRequest(err interface{}) Error {
+	return CreateErrorWithStatus(400, err)
 }
