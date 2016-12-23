@@ -23,19 +23,26 @@ type Error struct {
 	Message string `json:"message,omitempty"`
 	// 请求路径
 	Path    string `json:"path,omitempty"`
+	cause   error
 }
 
 func (self Error)Error() string {
 	return self.Message
 }
+func (self Error)Cause() error {
+	return self.cause
+}
 
 func CreateError(err interface{}) (e Error) {
-	if v, ok := err.(Error); ok {
-		return v
-	}
-	if v, ok := err.(error); ok {
-		e.Message = v.Error()
-	} else {
+	switch v := err.(type){
+	case Error:
+		e = v
+	case error:
+		e.Message = fmt.Sprint(err)
+		e.cause = v
+	case string:
+		e.Message = v
+	default:
 		e.Message = fmt.Sprint(err)
 	}
 	e.Message = strings.TrimSpace(e.Message)
