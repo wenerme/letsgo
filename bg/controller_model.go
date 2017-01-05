@@ -2,6 +2,7 @@ package bg
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Created struct {
