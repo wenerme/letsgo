@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 // 避免在 Go 进行指针运算
 char *StrArrAt(char **strArr, int n) {

@@ -12,7 +12,7 @@ import "fmt"
 func StrArrToByteSlice(arr unsafe.Pointer, c int) [][]byte {
     slices := make([][]byte, c)
     for i := 0; i < c; i ++ {
-        s := C.StrArrAt(arr, C.int(i))
+        s := C.StrArrAt((**C.char)(arr), C.int(i))
         l := C.int(C.strlen(s))
         //func C.GoBytes(cArray unsafe.Pointer, length C.int) []byte
         slices[i] = C.GoBytes(unsafe.Pointer(s), l)
