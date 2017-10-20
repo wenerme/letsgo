@@ -30,7 +30,11 @@ func (self *Command) AppendPreRun(f func(cmd *Command, args []string) error) *Co
 	return self
 }
 
+func (self *Command) InstallPersistent(conf ... CommandConf) *Command {
+	confOf(self).Install(self.PersistentFlags(),self, conf...)
+	return self
+}
 func (self *Command) Install(conf ... CommandConf) *Command {
-	confOf(self).Install(self, conf...)
+	confOf(self).Install(self.Flags(),self, conf...)
 	return self
 }
