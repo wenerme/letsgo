@@ -2,9 +2,8 @@ package wcobra
 
 import (
 	"context"
-	"reflect"
 	"github.com/spf13/pflag"
-	"github.com/spf13/cobra"
+	"reflect"
 )
 
 type CommandConfPost interface {
@@ -27,21 +26,41 @@ func confOf(cmd *Command) *commandConf {
 			confs: make(map[reflect.Type]CommandConf),
 		}
 		cmd.Context = context.WithValue(cmd.Context, commandConfKey, conf)
-
-		cobra.OnInitialize(func() {
-			conf.PostInstall(cmd)
-		})
 	}
 	return conf
 }
 
-func (self *commandConf) Install(fs *pflag.FlagSet, cmd *Command, conf ... CommandConf) error {
+func (self *commandConf) InstallPersistent(cmd *Command, conf ...CommandConf) error {
+	return self.install(cmd, true, conf...)
+}
+func (self *commandConf) Install(cmd *Command, conf ...CommandConf) error {
+	return self.install(cmd, false, conf...)
+}
+
+func (self *commandConf) install(cmd *Command, persists bool, conf ...CommandConf) error {
+	fs := cmd.Flags()
+	if persists {
+		fs = cmd.PersistentFlags()
+	}
 	for _, v := range conf {
 		if self.confs[reflect.TypeOf(v)] == nil {
 			if err := v.Install(fs, cmd); err != nil {
 				return err
 			}
 			self.confs[reflect.TypeOf(v)] = v
+
+			// Only post install if command run
+			if p, ok := v.(CommandConfPost); ok {
+				if persists {
+					cmd.PersistentPreRunE = AppendRunE(cmd.PersistentPreRunE, func(cmd *Command, args []string) error {
+						return p.PostInstall(cmd)
+					})
+				} else {
+					cmd.PreRunE = AppendRunE(cmd.PreRunE, func(cmd *Command, args []string) error {
+						return p.PostInstall(cmd)
+					})
+				}
+			}
 		}
 	}
 	return nil

@@ -1,9 +1,9 @@
 package wcobra
 
 import (
+	"context"
 	"github.com/spf13/cobra"
 	"reflect"
-	"context"
 )
 
 var commends = make(map[*cobra.Command]*Command)
@@ -25,16 +25,11 @@ type Command struct {
 	context.Context
 }
 
-func (self *Command) AppendPreRun(f func(cmd *Command, args []string) error) *Command {
-	self.PreRunE = AppendRunE(self.PreRunE, f)
+func (self *Command) InstallPersistent(conf ...CommandConf) *Command {
+	confOf(self).InstallPersistent(self, conf...)
 	return self
 }
-
-func (self *Command) InstallPersistent(conf ... CommandConf) *Command {
-	confOf(self).Install(self.PersistentFlags(),self, conf...)
-	return self
-}
-func (self *Command) Install(conf ... CommandConf) *Command {
-	confOf(self).Install(self.Flags(),self, conf...)
+func (self *Command) Install(conf ...CommandConf) *Command {
+	confOf(self).Install(self, conf...)
 	return self
 }
