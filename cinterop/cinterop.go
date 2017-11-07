@@ -5,13 +5,6 @@ package cinterop
 #include <stdlib.h>
 #include <stdint.h>
 
-void cinterop_int_array(int* ptr, int len, int* arr)
-{
-	for(int i = 0; i < len; i ++)
-	{
-		arr[i] = ptr[i];
-	}
-}
 int cinterop_int_array_at(int* ptr, int i)
 {
 	return ptr[i];

@@ -1,12 +1,10 @@
-package fs
+package wfs
 
 import "os"
 
 func Exists(p string) bool {
-    if _, err := os.Stat(p); err != nil {
-        return false
-    }
-    return true
+	if _, err := os.Stat(p); err != nil {
+		return false
+	}
+	return true
 }
-
-
