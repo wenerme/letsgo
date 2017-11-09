@@ -2,6 +2,7 @@ package wcompress
 
 import (
 	"context"
+	"github.com/wenerme/letsgo/fs"
 	"io"
 	"path/filepath"
 )
@@ -30,4 +31,19 @@ func FindCompressorByExt(ext string) *Compressor {
 }
 func IsCompressed(fn string) bool {
 	return FindCompressorByExt(filepath.Ext(fn)) != nil
+}
+
+func FinalName(path string) string {
+	var (
+		fn    = path
+		final string
+		ext   string
+	)
+	for {
+		ext, final = wfs.Ext(fn)
+		if FindCompressorByExt(ext) == nil {
+			return fn
+		}
+		fn = final
+	}
 }

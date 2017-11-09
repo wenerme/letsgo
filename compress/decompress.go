@@ -5,17 +5,38 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"context"
+	"github.com/wenerme/letsgo/fs"
 	"io"
+	"io/ioutil"
+	"os"
 )
 
+func DecompressAll(file string) (fn string, b []byte, err error) {
+	var (
+		f *os.File
+		r io.Reader
+	)
+	if f, err = os.Open(file); err != nil {
+		return
+	}
+	defer f.Close()
+	if fn, r, err = Decompress(f, file); err != nil {
+		return
+	}
+	b, err = ioutil.ReadAll(r)
+	return
+}
 func Decompress(reader io.Reader, file string) (fn string, r io.Reader, err error) {
 	return DecompressWithContext(reader, file, context.Background())
 }
 func DecompressWithContext(reader io.Reader, file string, ctx context.Context) (fn string, r io.Reader, err error) {
 	fn = file
 	r = reader
-	if !IsCompressed(fn) {
-		return
+
+	ext, final := wfs.Ext(file)
+	if c := FindCompressorByExt(ext); c != nil {
+		fn = final
+		r, err = c.Decompress(ctx, reader)
 	}
 	return
 }
@@ -43,7 +64,7 @@ func init() {
 
 	Registry(Compressor{
 		Name: "gzip",
-		Ext:  []string{".gz"},
+		Ext:  []string{".gz", ".dz"},
 		Decompress: func(ctx context.Context, reader io.Reader) (io.Reader, error) {
 			return gzip.NewReader(reader)
 		},
